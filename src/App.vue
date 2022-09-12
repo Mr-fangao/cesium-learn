@@ -3,8 +3,9 @@
     <div class="nav">
       <el-menu class="el-menu-demo" :background-color="bgcstatus ? '#2d2e30' : 'rgba(242, 244, 248, 0)'"
         text-color="#f5f6f7" active-text-color="#ffd04b" :router="true">
-        <el-menu-item index="/cesiumContainer">首页</el-menu-item>
-        <el-menu-item index="/CreateEntities">组件</el-menu-item>
+        <el-menu-item index="/cesiumContainer">建筑</el-menu-item>
+        <el-menu-item index="/CreateEntities">几何图形</el-menu-item>
+        <el-menu-item index="/CreateModels">3D模型</el-menu-item>
       </el-menu>
     </div>
     <!-- <router-link to="/cesiumContainer">home</router-link>//跳转首页
@@ -16,7 +17,7 @@
 export default {
   name: 'app',
   mounted() {
-
+    this.$router.push("/InitPage")
   }
 }
 
