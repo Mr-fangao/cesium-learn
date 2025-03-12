@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "coordtransform": "^2.1.2",
     "dat.gui": "^0.7.9",
     "element-plus": "^2.9.6",
     "less": "^4.2.2",
