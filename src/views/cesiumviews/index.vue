@@ -1,8 +1,8 @@
 <!--
  * @Author: liqifeng
  * @Date: 2025-03-11 16:43:00
- * @LastEditors: liqifeng Mr.undefine@protonmail.com
- * @LastEditTime: 2025-03-12 17:35:50
+ * @LastEditors: Mr-fangao Mr.undefine@protonmail.com
+ * @LastEditTime: 2025-03-12 19:56:42
  * @Description: 
 -->
 <template>
@@ -33,7 +33,7 @@ onMounted(() => {
     position: absolute;
 
     #mapcontainer {
-        width: 1920px;
+        width: 100%;
         height: 100vh;
         left: 0;
         top: 0;

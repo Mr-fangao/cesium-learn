@@ -1,8 +1,8 @@
 <!--
  * @Author: liqifeng
  * @Date: 2025-03-11 16:59:45
- * @LastEditors: liqifeng Mr.undefine@protonmail.com
- * @LastEditTime: 2025-03-12 17:41:15
+ * @LastEditors: Mr-fangao Mr.undefine@protonmail.com
+ * @LastEditTime: 2025-03-12 21:49:47
  * @Description: 
 -->
 <script setup>
@@ -24,6 +24,7 @@ const handleResize = () => {
 function showPrimitive() {
   drawTraingle();
   addCustomTriangle(viewer);
+  addCircleGeometry(viewer);
   setTimeout(() => {
   }, 200);
 }
@@ -32,8 +33,9 @@ function drawTraingle() {
     new Cesium.Primitive({
       geometryInstances: new Cesium.GeometryInstance({
         geometry: Cesium.BoxGeometry.fromDimensions({
-          vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+          // vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
           dimensions: new Cesium.Cartesian3(400000.0, 400000.0, 400000.0),
+          vertexFormat: Cesium.EllipsoidSurfaceAppearance.VERTEX_FORMAT,
         }),
         modelMatrix: Cesium.Matrix4.multiplyByTranslation(
           Cesium.Transforms.eastNorthUpToFixedFrame(
@@ -48,9 +50,19 @@ function drawTraingle() {
           ),
         },
       }),
-      appearance: new Cesium.PerInstanceColorAppearance({
-        closed: true,
-      }),
+      appearance: new Cesium.EllipsoidSurfaceAppearance({
+        material: new Cesium.Material({
+        fabric: {
+            type: 'Stripe', // 使用条纹材质
+            uniforms: {
+                orientation: 'vertical', // 垂直方向
+                evenColor: Cesium.Color.RED.withAlpha(0.3), // 起始颜色（红色，透明度 0.6）
+                oddColor: Cesium.Color.BLUE.withAlpha(0.3), // 结束颜色（蓝色，透明度 0.6）
+                repeat: 10 // 渐变重复次数
+            }
+        }
+    })
+      })
     }),
   );
   viewer.scene.primitives.add(
@@ -68,6 +80,34 @@ function drawTraingle() {
       appearance: new Cesium.PerInstanceColorAppearance(),
     }),
   );
+}
+function addCircleGeometry(viewer) {
+  let p = [110.0, 30.0];
+  let instances = [];
+  for (let i = 0; i < 10; i++) {
+    const instance = new Cesium.GeometryInstance({
+      geometry: new Cesium.EllipseGeometry({
+        center: Cesium.Cartesian3.fromDegrees(p[0], p[1]),
+        semiMinorAxis: 20000.0,
+        semiMajorAxis: 20000.0,
+        height: 30000 * i,
+        vertexFormat: Cesium.EllipsoidSurfaceAppearance.VERTEX_FORMAT,
+        // vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
+      }),
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.RED),
+      },
+    });
+    instances.push(instance);
+  }
+  viewer.scene.primitives.add(new Cesium.Primitive({
+    geometryInstances: instances,
+    appearance: new Cesium.EllipsoidSurfaceAppearance({
+      material: Cesium.Material.fromType('Color', {
+        color: new Cesium.Color(1.0, 0.0, 0.0, 0.6) // 红色，完全不透明
+      })
+    })
+  }));
 }
 function addCustomTriangle(viewer) {
   // 定义三角形的顶点坐标（WGS84 坐标系）
@@ -115,12 +155,15 @@ function addCustomTriangle(viewer) {
         color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.RED)
       }
     }),
+    boundingSphere: Cesium.BoundingSphere.fromVertices(
+      coords_vbo,
+      new Cesium.Cartesian3(0.0, 0.0, 0.0),
+      3
+    ),
     asynchronous: false,
     appearance: Cesium.PerInstanceColorAppearance({
-      flat: true,
-      closed: true,
-      renderState:{},
-      translucent: false // 不透明
+      flat: false,//为true时没有阴影，很难看到三维效果
+      translucent: false,
     }),
   });
 
@@ -128,7 +171,7 @@ function addCustomTriangle(viewer) {
 
   // 缩放到三角形
   viewer.camera.setView({
-    destination: Cesium.Rectangle.fromDegrees(-74, 40, -74, 41)
+    destination: Cesium.Rectangle.fromDegrees(105, 45, 120, 25)
   });
 }
 onMounted(() => {
