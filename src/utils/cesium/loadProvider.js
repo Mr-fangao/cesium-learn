@@ -2,7 +2,7 @@
  * @Author: dongnan
  * @Description:底图
  * @Date: 2021-11-07 00:19:09
- * @LastEditTime: 2024-05-15 13:50:24
+ * @LastEditTime: 2025-03-12 17:36:56
  */
 import { wgs84togcj02, gcj02towgs84 } from "coordtransform";
 import BaiduImageryProvider from "./libs/baidu/BaiduImageryProvider";
@@ -356,6 +356,7 @@ export function getGoogleImage(show) {
 	});
 	const layer = Cesium.ImageryLayer.fromProviderAsync(provider);
 	return {
+		provider:provider,
 		layer: layer,
 		name: "谷歌影像地图",
 		show: show ?? false,

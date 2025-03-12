@@ -38,6 +38,7 @@ export function CesiumViewer(imageryList, containerId = "CesiumMap", mode) {
 		homeButton: false, //主页,
 		shouldAnimate: true,
 		shadows: false,
+		scene3DOnly: true,
 	};
 	//超图修改球
 	// var obj = [6378137.0, 6378137.0, 6356752.3142451793];

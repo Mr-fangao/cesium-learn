@@ -2,7 +2,7 @@
  * @Author: liqifeng
  * @Date: 2025-03-11 16:43:00
  * @LastEditors: liqifeng Mr.undefine@protonmail.com
- * @LastEditTime: 2025-03-12 10:17:25
+ * @LastEditTime: 2025-03-12 17:35:50
  * @Description: 
 -->
 <template>
@@ -15,10 +15,11 @@
 <script lang="ts" setup>
 import { CesiumViewer, getWebTile } from "./handler/maphandler";
 import { GlobalState } from "@/buss/GlobalState";
-import { getTdtVector, getTdtVectorLabel, getTdtImage, getTdtImageLabel } from "@/utils/cesium/loadProvider.js";
+import { getTdtVector, getTdtVectorLabel, getTdtImage, getTdtImageLabel,getGoogleImage,getGisImage,getGisVector,getOsm } from "@/utils/cesium/loadProvider.js";
 const isCesium = ref(true);
 onMounted(() => {
-    CesiumViewer([getTdtImageLabel(), getTdtImage()], "mapcontainer");
+    // CesiumViewer([getTdtImageLabel(), getTdtImage()], "mapcontainer");
+    CesiumViewer([getTdtImage()], "mapcontainer");
 });
 </script>
 <style lang="less">
