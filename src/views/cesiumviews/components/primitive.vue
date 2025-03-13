@@ -2,7 +2,7 @@
  * @Author: liqifeng
  * @Date: 2025-03-11 16:59:45
  * @LastEditors: liqifeng Mr.undefine@protonmail.com
- * @LastEditTime: 2025-03-13 14:36:20
+ * @LastEditTime: 2025-03-13 16:40:31
  * @Description: 
 -->
 <script setup>
@@ -24,10 +24,13 @@ const handleResize = () => {
 function showPrimitive() {
   drawPrimitive();
   addCorridorGeometry(viewer);
-  addCustomTriangle(viewer);
   addCircleGeometry(viewer);
   addWallGeometry(viewer);
-  addPolylineVolumeGeometry(viewer)
+  addPolylineVolumeGeometry(viewer);
+  viewer.camera.setView({
+    destination: Cesium.Rectangle.fromDegrees(105, 45, 120, 25)
+  });
+  // addCustomTriangle(viewer);
   // addCustomTriangleDS(viewer);
   setTimeout(() => {
   }, 200);
@@ -265,64 +268,71 @@ function addCircleGeometry(viewer) {
   }));
 }
 function addCustomTriangle(viewer) {
-  // 定义三角形的顶点坐标（WGS84 坐标系）
-  const positions = [
-    [-75.0, 40.0, 100.0,],// 顶点1
-    [-67.0, 35.0, 100.0,],// 顶点2
-    [-60.5, 30.0, 100.0]  // 顶点3
-  ];
-  const colors = new Uint8Array([
-    255, 0, 0, 255,   // 红色 (节点1)
-    0, 255, 0, 255,   // 绿色 (节点2)
-    0, 0, 255, 255    // 蓝色 (节点3)
+  // 顶点数据
+  const positions = new Float32Array([
+    0.0, 0.0, 0.0,
+    1.0, 0.0, 0.0,
+    0.0, 1.0, 0.0
   ]);
-  const coords_world = positions.map((coord) => {
-    const cart = Cesium.Cartesian3.fromDegrees(...coord)
-    return [cart.x, cart.y, cart.z]
-  })
-  const coords_vbo = new Float64Array(coords_world.flat())
-  console.log(coords_vbo);
-  // 创建三角形几何体
-  const triangleGeometry = new Cesium.Geometry({
-    // vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT, // 指定所需的顶点格式
+
+  const colors = new Float32Array([
+    1.0, 0.0, 0.0,
+    0.0, 1.0, 0.0,
+    0.0, 0.0, 1.0
+  ]);
+
+  // 创建几何
+  const geometry = new Cesium.Geometry({
     attributes: {
       position: new Cesium.GeometryAttribute({
-        componentDatatype: Cesium.ComponentDatatype.DOUBLE,
+        componentDatatype: Cesium.ComponentDatatype.FLOAT,
         componentsPerAttribute: 3,
-        values: coords_vbo,
-        // vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT // 指定所需的顶点格式
+        values: positions
+      }),
+      color: new Cesium.GeometryAttribute({
+        componentDatatype: Cesium.ComponentDatatype.FLOAT,
+        componentsPerAttribute: 3,
+        values: colors
       })
     },
-    color: new Cesium.GeometryAttribute({
-      componentDatatype: Cesium.ComponentDatatype.UNSIGNED_BYTE,
-      componentsPerAttribute: 4,
-      values: colors,
-      normalize: true // 归一化到 [0, 1]
-    }),
-    vertexFormat: Cesium.VertexFormat.POSITION_AND_COLOR,
-    indices: new Uint16Array([0, 1, 2]), // 三角形索引
+    indices: new Uint16Array([0, 1, 2]),
     primitiveType: Cesium.PrimitiveType.TRIANGLES
   });
-  // 创建 Primitive 并添加到场景
-  const trianglePrimitive = new Cesium.Primitive({
-    geometryInstances: new Cesium.GeometryInstance({
-      geometry: triangleGeometry,
-    }),
-    boundingSphere: Cesium.BoundingSphere.fromVertices(
-      coords_vbo,
-      new Cesium.Cartesian3(0.0, 0.0, 0.0),
-      3
-    ),
-    asynchronous: false,
-    appearance: Cesium.PerInstanceColorAppearance({
-      flat: false,//为true时没有阴影，很难看到三维效果
-      translucent: false,
-      // vertexFormat: Cesium.VertexFormat.POSITION_AND_COLOR  ,
-    }),
+
+  // 创建着色器外观
+  const appearance = new Cesium.Appearance({
+    materialSupport: Cesium.MaterialAppearance.MaterialSupport.BASIC,
+    renderState: Cesium.Appearance.getDefaultRenderState(true, false),
+    vertexShaderSource: `
+        attribute vec3 position;
+        attribute vec3 color;
+        varying vec3 vColor;
+        void main() {
+            gl_Position = czm_modelViewProjection * vec4(position, 1.0);
+            vColor = color;
+        }
+    `,
+    fragmentShaderSource: `
+        precision mediump float;
+        varying vec3 vColor;
+        void main() {
+            gl_FragColor = vec4(vColor, 1.0);
+        }
+    `
   });
 
-  viewer.scene.primitives.add(trianglePrimitive);
+  // 创建 Primitive
+  const primitive = new Cesium.Primitive({
+    geometryInstances: new Cesium.GeometryInstance({
+      geometry: geometry
+    }),
 
+    appearance: appearance,
+    asynchronous: false
+  });
+
+  // 添加到 Cesium 场景
+  viewer.scene.primitives.add(primitive);
   // 缩放到三角形
   viewer.camera.setView({
     destination: Cesium.Rectangle.fromDegrees(105, 45, 120, 25)
