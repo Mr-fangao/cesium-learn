@@ -1,8 +1,8 @@
 <!--
  * @Author: liqifeng
  * @Date: 2025-03-11 16:59:45
- * @LastEditors: liqifeng Mr.undefine@protonmail.com
- * @LastEditTime: 2025-03-13 16:40:31
+ * @LastEditors: Mr-fangao Mr.undefine@protonmail.com
+ * @LastEditTime: 2025-03-13 22:20:07
  * @Description: 
 -->
 <script setup>
@@ -27,6 +27,7 @@ function showPrimitive() {
   addCircleGeometry(viewer);
   addWallGeometry(viewer);
   addPolylineVolumeGeometry(viewer);
+  addCylinderGeometry(viewer)
   viewer.camera.setView({
     destination: Cesium.Rectangle.fromDegrees(105, 45, 120, 25)
   });
@@ -34,6 +35,51 @@ function showPrimitive() {
   // addCustomTriangleDS(viewer);
   setTimeout(() => {
   }, 200);
+}
+function addCylinderGeometry(viewer) {
+  const circle = new Cesium.CylinderGeometry({
+    //  vertexFormat: Cesium.MaterialAppearance.VERTEX_FORMAT,
+    length: 100000,
+    topRadius: 30000,
+    bottomRadius: 50000,
+    slices: 3
+  })
+  const geometry = Cesium.CylinderGeometry.createGeometry(circle)
+  const instance = new Cesium.GeometryInstance({
+    geometry: geometry,
+    modelMatrix: Cesium.Transforms.eastNorthUpToFixedFrame(
+      Cesium.Cartesian3.fromDegrees(110.0, 25.0, 5000)
+    )
+  })
+  viewer.scene.primitives.add(
+    new Cesium.Primitive({
+      asynchronous: false,
+      geometryInstances: instance,
+      appearance: new Cesium.MaterialAppearance({
+        material: new Cesium.Material({
+          fabric: {
+            type: 'Custom',
+            uniforms: {
+              baseColor: new Cesium.Color(1.0, 0.0, 0.0, 1.0), // 基础颜色（红色）
+              topColor: new Cesium.Color(0.0, 0.0, 1.0, 0.5)  // 顶部颜色（蓝色，半透明）
+            },
+            source: `
+                    czm_material czm_getMaterial(czm_materialInput materialInput) {
+                      czm_material material = czm_getDefaultMaterial(materialInput);
+                      // 获取纹理坐标的垂直分量（t）
+                      float t = materialInput.st.t;
+                      // 混合基础颜色和顶部颜色
+                      vec4 color = mix(baseColor, topColor, t);
+                      material.diffuse = color.rgb;
+                      material.alpha = color.a;
+                      return material;
+                    }
+                  `
+          }
+        }),
+      })
+    })
+  )
 }
 function addWallGeometry(viewer) {
   let positions = [
