@@ -2,13 +2,14 @@
  * @Author: liqifeng
  * @Date: 2025-01-23 17:32:44
  * @LastEditors: liqifeng Mr.undefine@protonmail.com
- * @LastEditTime: 2025-03-11 17:33:20
+ * @LastEditTime: 2025-03-14 11:12:18
  * @Description: 
 -->
 <template>
     <div class="container">
         <div class="card-list">
             <div v-for="card in cards" :key="card.id" class="card" @click="pushRouter(card.path)">
+                <img :src="'/img/views/' + card.name + '.png'" alt="">
                 <div class="card-title">{{ card.content }}</div>
             </div>
         </div>
@@ -104,13 +105,26 @@ onMounted(() => {
     overflow: hidden;
     /* 防止内容溢出圆角 */
     /* 背景图片设置 */
-    background-image: url('your-image-path.jpg');
+    // background-image: url('your-image-path.jpg');
     background-size: cover;
     /* 图片覆盖整个卡片 */
     background-position: center;
     /* 图片居中显示 */
     /* 悬停动效 */
     transition: transform 0.3s ease;
+
+    img {
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        background-size: 100%;
+        background-size: cover;
+        /* 图片覆盖整个卡片 */
+        background-position: center;
+    }
 }
 
 .card:hover {
@@ -121,7 +135,7 @@ onMounted(() => {
 
 /* 标题样式 */
 .card-title {
-    width: calc( 100% - 24px );
+    width: calc(100% - 24px);
     font-size: 1em;
     font-weight: bold;
     color: #fff;

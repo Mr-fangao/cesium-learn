@@ -1,13 +1,15 @@
 <!--
  * @Author: liqifeng
  * @Date: 2025-03-11 16:59:45
- * @LastEditors: Mr-fangao Mr.undefine@protonmail.com
- * @LastEditTime: 2025-03-13 22:20:07
+ * @LastEditors: liqifeng Mr.undefine@protonmail.com
+ * @LastEditTime: 2025-03-14 10:58:09
  * @Description: 
 -->
 <script setup>
 import { GlobalState } from "@/buss/GlobalState";
 import { nextTick } from "vue";
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const { proxy } = getCurrentInstance();
 const guiContainer = ref(null);
 const dat = proxy.$dat;
@@ -17,6 +19,10 @@ const params = {
   speed: 0.5,
   color: '#ff0000',
   visible: true,
+  backMenu: () => {
+    router.push('/menu');
+    viewer.scene.primitives.removeAll();
+  }
 };
 const handleResize = () => {
   viewer && viewer.resize()
@@ -66,10 +72,10 @@ function addCylinderGeometry(viewer) {
             source: `
                     czm_material czm_getMaterial(czm_materialInput materialInput) {
                       czm_material material = czm_getDefaultMaterial(materialInput);
-                      // 获取纹理坐标的垂直分量（t）
-                      float t = materialInput.st.t;
+                     // 获取顶点的高度（相对于底部的比例）
+                      float height = materialInput.st.t;
                       // 混合基础颜色和顶部颜色
-                      vec4 color = mix(baseColor, topColor, t);
+                      vec4 color = mix(baseColor, topColor, height);
                       material.diffuse = color.rgb;
                       material.alpha = color.a;
                       return material;
@@ -452,11 +458,12 @@ function addCustomTriangleDS(viewer) {
   });
 }
 onMounted(() => {
-  gui.add(params, 'speed', 0, 1).name('Speed').onChange((value) => {
-    console.log('Speed changed to:', value);
-  });;
-  gui.addColor(params, 'color').name('Color');
+  // gui.add(params, 'speed', 0, 1).name('Speed').onChange((value) => {
+  //   console.log('Speed changed to:', value);
+  // });;
+  // gui.addColor(params, 'color').name('Color');
   gui.add(params, 'visible').name('Visible');
+  gui.add(params, 'backMenu').name('返回菜单');
   guiContainer.value.appendChild(gui.domElement);
   window.addEventListener('resize', handleResize)
   nextTick(() => {
@@ -465,9 +472,13 @@ onMounted(() => {
   });
 });
 onBeforeUnmount(() => {
-  gui.destroy();
-  window.removeEventListener('resize', handleResize)
+  setTimeout(() => {
+    gui.destroy();
+  }, 0);
+  window.removeEventListener('resize', handleResize);
+  viewer.scene.primitives.removeAll();
 });
+
 </script>
 
 <template>
