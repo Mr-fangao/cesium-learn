@@ -99,7 +99,7 @@ function extractSkyline() {
         fragmentShader: skyline1,
         uniforms : {
             length : 0.1,
-            color : Cesium.Color.clone(Cesium.Color.RED)
+            color : Cesium.Color.clone(Cesium.Color.BLUE)
         }
     });
    // let edgeDetection = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
@@ -146,10 +146,7 @@ function getSkyline2D() {
     //let data=GlobalState.getInstance().GetCurrentSkylineData(this.skyLineStage.name);
     let i=0;
     // let datalist=getCurrentSkylineData();
-
-    
 	let datalist=extractskyline.GetCurrentSkylineData(this.skyLineStage.name);
-    console.log(this.skyLineStage.name,datalist);
     // let canvas = $('.cesium-widget')[0].firstChild;
     // let canvas = this.collection.outputTexture._context.canvas;
     // let colorData = canvas.getPixelColor(150, 200);
