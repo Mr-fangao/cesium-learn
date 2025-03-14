@@ -1,0 +1,60 @@
+.popdialog {
+  position: absolute;
+  z-index: 2000;
+  .popdialog-title {
+    height: 3.4vh;
+    line-height: 3.4vh;
+    width: 100%;
+
+    position:relative;
+    //background: #1381bc;
+    //text-align: center;
+    //border: none;
+
+    //height: 5vh;
+    //line-height: 5vh;
+
+    
+    background: url("/img/modal/header-middle.svg#svgView(preserveAspectRatio(none))") no-repeat;
+    text-align: left;
+    // padding-left: 3vh;
+    border: none;
+
+    border: none;
+    //display: flex;
+    //align-items: center;
+    //justify-content: space-between;
+    .popdialog-title-text {
+      font-size: 1.6vh;
+      color: #ffffff;
+      font-family: puhui_SemiBold_75;
+      margin-left: 2vh;
+    }
+    .closeicon {
+      width: 1.2vh;
+      height: 1.2vh;
+      cursor: pointer;
+      position:absolute;
+      right:1vh;
+      top:1vh;
+      pointer-events: auto;
+      //margin-right: 3vh;
+    }
+  }
+  .contentDiv {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    min-height: 1vh;
+    background: url("/img/modal/body-big.svg#svgView(preserveAspectRatio(none))") no-repeat;
+    margin-top: -0.2vh;
+    //background: url(./roundborderleft.png) left bottom no-repeat, url(./roundborderright.png) right bottom no-repeat, rgba(27, 37, 45, 0.8);
+    //background-size: 12px 12px, 12px 12px, 100% 100%;
+    color: #fff;
+    font-family: puhui_thin_45;
+    //border: 1px solid #17446e;
+    //border-top: none;
+  }
+}

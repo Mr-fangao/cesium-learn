@@ -2,7 +2,7 @@
  * @Author: liqifeng
  * @Date: 2025-01-23 17:32:44
  * @LastEditors: liqifeng Mr.undefine@protonmail.com
- * @LastEditTime: 2025-03-14 11:12:18
+ * @LastEditTime: 2025-03-14 14:43:55
  * @Description: 
 -->
 <template>
@@ -37,11 +37,10 @@ const cards = ref<Menu[]>(
         path: menu.path,
         name: menu.id,
         content: menu.content,
-        component: () => import(`@/views/cesiumviews/components/${menu.id}.vue`), // 子菜单页面
+        defineAsyncComponent: () => import(`@/views/cesiumviews/components/${menu.id}.vue`), // 子菜单页面
     })),
 );
 function pushRouter(path: string) {
-    console.log(path);
     router.push(`${path}`);
 }
 onMounted(() => {

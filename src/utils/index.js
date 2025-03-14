@@ -8,7 +8,6 @@ import drag from "./directive/drag";
 import getAssets from "./tools/getAssets";
 import * as echarts from "echarts";
 import { fontSize_VW, fontSize_VH } from "./tools/windowSize";
-
 export default function installPlugins(app) {
 	// 模态框对象
 	app.config.globalProperties.$modal = modal;
