@@ -104,9 +104,8 @@ export function CesiumViewer(imageryList, containerId = "CesiumMap", mode) {
 	// viewer.scene.screenSpaceCameraController.tiltEventTypes = [Cesium.CameraEventType.PINCH, Cesium.CameraEventType.RIGHT_DRAG];
 	//开启抗锯齿
 	if (Cesium.FeatureDetection.supportsImageRenderingPixelated()) {
-		//判断是否支持图像渲染像素化处理
 		viewer.resolutionScale = window.devicePixelRatio;
-	}
+	  }
 	// let promise = Cesium.GeoJsonDataSource.load(FyConfig.shuikujson, {
 	// 	clampToGround: true,
 	// }); //geojson面数据

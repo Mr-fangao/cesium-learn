@@ -404,7 +404,7 @@ function GetCurrentSkylineData(stagename, webglcontainerid) {
     let viewer = GlobalState.getInstance().viewer;
 	let canvasheight = viewer.canvas.height;
 	let canvaswidth = viewer.canvas.width;
-    console.log(viewer.scene.postProcessStages);
+    // console.log(viewer.scene.postProcessStages);
 	let stage = viewer.scene.postProcessStages._activeStages.find(item => item.name == stagename);
 	let result = [];
 	let errorresult = [];
@@ -438,7 +438,7 @@ function GetCurrentSkylineData(stagename, webglcontainerid) {
 				windowy: findy,
 				direction: 3,//1:向右，2：向左，3：向上，4：向下，5：向右上方，6：向右下方，7：向左上方，8：向左下方，9：原本自己
 			})
-		}   
+		}
 		else {
 			if (result.length > 0) {
 				break;

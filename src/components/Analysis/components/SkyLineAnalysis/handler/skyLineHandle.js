@@ -1,6 +1,7 @@
 import extractskyline from './extractSkyline';
 import { GlobalState } from '@/buss/GlobalState';
-
+//边缘检测的权重由scalars数组决定
+//边缘检测的采样范围由padx和pady决定。通过增加这两个值，可以扩大采样范围，从而使边缘线变粗
 const skyline1 = `
 uniform sampler2D colorTexture;
 uniform sampler2D depthTexture;
@@ -15,12 +16,12 @@ void main(void){
     directions[2] = 1.0;
 
     float scalars[3];
-    scalars[0] = 3.0;
-    scalars[1] = 10.0;
-    scalars[2] = 3.0;
+    scalars[0] = 5.0;
+    scalars[1] = 12.0;
+    scalars[2] = 5.0;
 
-    float padx = 1.0 / czm_viewport.z;
-    float pady = 1.0 / czm_viewport.w;
+    float padx = 2.0 / czm_viewport.z;
+    float pady = 2.0 / czm_viewport.w;
 
     #ifdef CZM_SELECTED_FEATURE
         bool selected = false;
@@ -94,11 +95,12 @@ void main(void){
 function extractSkyline() {
     let viewer = GlobalState.getInstance().viewer;
     this.collection = viewer.scene.postProcessStages;
+    //边缘检测的阈值由length决定。通过减小length的值可以使更多的像素被识别为边缘，从而让天际线变粗
     this.edgeDetection=new Cesium.PostProcessStage({
         name : 'czm_edge_detection_' + "ddddddd",
         fragmentShader: skyline1,
         uniforms : {
-            length : 0.1,
+            length : 0.05,
             color : Cesium.Color.clone(Cesium.Color.BLUE)
         }
     });
@@ -158,7 +160,6 @@ function getSkyline2D() {
 	}
 	let width = datalist.width;
 	let height=datalist.height;
-    console.log(data )
 	let myChart = echarts.init(document.getElementById("skyline-map"));
 	let option = {
 		backgroundColor: "rgba(0,0,0,0)",
