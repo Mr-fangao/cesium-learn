@@ -2,7 +2,7 @@
  * @Author: liqifeng
  * @Date: 2025-03-11 16:59:45
  * @LastEditors: liqifeng Mr.undefine@protonmail.com
- * @LastEditTime: 2025-03-14 10:58:09
+ * @LastEditTime: 2025-03-21 14:14:00
  * @Description: 
 -->
 <script setup>
@@ -28,6 +28,9 @@ const handleResize = () => {
   viewer && viewer.resize()
 }
 function showPrimitive() {
+  // addFlowLine2(viewer);
+  addFlowLine3(viewer)
+  addFlowLine(viewer);
   drawPrimitive();
   addCorridorGeometry(viewer);
   addCircleGeometry(viewer);
@@ -42,6 +45,234 @@ function showPrimitive() {
   setTimeout(() => {
   }, 200);
 }
+function addFlowLine(viewer) {
+  let data = [
+    [110.57315539991978, 29.88574734630947],
+    [113.1880484982834, 29.574403124299916],
+    [118.1880484982834, 29.574403124299916],
+    [118.85621021175756, 29.99746963376292]
+  ]
+  const newData = data.flat();
+  const instance = new Cesium.GeometryInstance({
+    geometry: new Cesium.GroundPolylineGeometry({
+      positions: Cesium.Cartesian3.fromDegreesArray(newData),
+      vertexFormat: Cesium.VertexFormat.ALL,
+      width: 20,
+    }),
+    attributes: {
+      color: Cesium.ColorGeometryInstanceAttribute.fromColor(new Cesium.Color(1.0, 0.0, 0.0, 1.0))
+    }
+  });
+
+  const primitive = viewer.scene.primitives.add(
+    new Cesium.GroundPolylinePrimitive({
+      geometryInstances: instance,
+      appearance: new Cesium.PolylineMaterialAppearance({
+        material: customMaterial,
+        // material: Cesium.Material.fromType('Color', {
+        //     color: new Cesium.Color(1.0, 0.0, 0.0, 1.0)
+        // }),
+      }),
+      asynchronous: true,
+    })
+  );
+}
+const customMaterial = new Cesium.Material({
+  translucent: true,
+  fabric: {
+    uniforms: {
+      color: Cesium.Color.TRANSPARENT,
+      backgroundColor: Cesium.Color.TRANSPARENT,
+      image: "/public/img/arrow2.png",
+      imageW: 20,
+    },
+    source: `
+            // 旋转矩阵
+            mat2 rotate(float rad) {
+                float c = cos(rad);
+                float s = sin(rad);
+                return mat2(c, s, -s, c);
+            }
+            czm_material czm_getMaterial(czm_materialInput materialInput)
+            {
+                czm_material material = czm_getDefaultMaterial(materialInput);
+                vec2 st = materialInput.st;
+
+                // 使用 materialInput 计算角度
+                float angle = atan(materialInput.normalEC.y, materialInput.normalEC.x); // 例子，基于法向量
+                // 计算位置
+                vec2 pos = rotate(angle) * gl_FragCoord.xy;
+                float s = pos.x / (imageW * czm_pixelRatio);
+                float t = st.t;
+                float time = fract(czm_frameNumber / 1000.0);
+                s = s - czm_frameNumber / 60.0;
+                vec4 rawImage = texture(image, st);
+                vec4 colorImage = texture(image, vec2(fract(s), t));
+                vec3 finalColor = colorImage.rgb * colorImage.a + backgroundColor.rgb * (1.0 - colorImage.a);
+                material.diffuse = finalColor;
+                material.alpha = mix(backgroundColor.a, 1.0, colorImage.a);
+                return material;
+            }
+        `,
+  },
+});
+function addFlowLine2(viewer) {
+  function PolylineTrailLinkMaterialProperty(color, duration) {
+    this._definitionChanged = new Cesium.Event();
+    this._color = undefined;
+    this._colorSubscription = undefined;
+    this.color = color;
+    this.duration = duration;
+    this._time = (new Date()).getTime();
+  }
+  Object.defineProperties(PolylineTrailLinkMaterialProperty.prototype, {
+    isConstant: {
+      get: function () {
+        return false;
+      }
+    },
+    definitionChanged: {
+      get: function () {
+        return this._definitionChanged;
+      }
+    },
+    color: Cesium.createPropertyDescriptor('color')
+  });
+  PolylineTrailLinkMaterialProperty.prototype.getType = function (time) {
+    return 'PolylineTrailLink';
+  }
+  PolylineTrailLinkMaterialProperty.prototype.getValue = function (time, result) {
+    if (!Cesium.defined(result)) {
+      result = {};
+    }
+    result.color = Cesium.Property.getValueOrClonedDefault(this._color, time, Cesium.Color.WHITE, result.color);
+    result.image = Cesium.Material.PolylineTrailLinkImage;
+    result.time = (((new Date()).getTime() - this._time) % this.duration) / this.duration;
+    return result;
+  }
+  PolylineTrailLinkMaterialProperty.prototype.equals = function (other) {
+    return this === other ||
+      (other instanceof PolylineTrailLinkMaterialProperty &&
+        Property.equals(this._color, other._color))
+  }
+  Cesium.PolylineTrailLinkMaterialProperty = PolylineTrailLinkMaterialProperty;
+  Cesium.Material.PolylineTrailLinkType = 'PolylineTrailLink';
+  Cesium.Material.PolylineTrailLinkImage = "/public/img/arrow.png";//colors  
+  Cesium.Material.PolylineTrailLinkSource = "czm_material czm_getMaterial(czm_materialInput materialInput)\n\
+                                                      {\n\
+                                                           czm_material material = czm_getDefaultMaterial(materialInput);\n\
+                                                           vec2 st = materialInput.st;\n\
+                                                           vec4 colorImage = texture(image, vec2(fract(st.s - time), st.t));\n\
+                                                           material.alpha = colorImage.a * color.a;\n\
+                                                           material.diffuse = (colorImage.rgb+color.rgb)/2.0;\n\
+                                                           return material;\n\
+                                                       }";
+  Cesium.Material._materialCache.addMaterial(Cesium.Material.PolylineTrailLinkType, {
+    fabric: {
+      type: Cesium.Material.PolylineTrailLinkType,
+      uniforms: {
+        color: new Cesium.Color(1.0, 0.0, 0.0, 0.5),
+        image: Cesium.Material.PolylineTrailLinkImage,
+        time: 0
+      },
+      source: Cesium.Material.PolylineTrailLinkSource
+    },
+    translucent: function (material) {
+      return true;
+    }
+  });
+  let data = [
+    [110.57315539991978, 29.88574734630947],
+    [113.1880484982834, 29.574403124299916],
+    [118.1880484982834, 29.574403124299916],
+    [118.85621021175756, 29.99746963376292]
+  ]
+  const newData = data.flat();
+  let entity = viewer.entities.add({
+    name: 'PolylineTrail',
+    polyline: {
+      positions: Cesium.Cartesian3.fromDegreesArray(newData),
+      width: 15,
+      material: new Cesium.PolylineTrailLinkMaterialProperty(Cesium.Color.ORANGE, 30000)
+    }
+  });
+}
+function addFlowLine3(viewer) {
+  const customMaterial1 = new Cesium.Material({
+    translucent: true,
+    fabric: {
+      uniforms: {
+        color: Cesium.Color.TRANSPARENT,
+        backgroundColor: Cesium.Color.TRANSPARENT,
+        image: "/public/img/arrow.png",
+        imageW: 20,
+      },
+      source: `
+              in float v_polylineAngle;
+              mat2 rotate(float rad) {
+                  float c = cos(rad);
+                  float s = sin(rad);
+                  return mat2(
+                      c, s,
+                      -s, c
+                  );
+              }
+              czm_material czm_getMaterial(czm_materialInput materialInput)
+              {
+                  czm_material material = czm_getDefaultMaterial(materialInput);
+                  vec2 st = materialInput.st;
+                  vec2 pos = rotate(v_polylineAngle) * gl_FragCoord.xy;
+                  float s = pos.x / (imageW * czm_pixelRatio);
+                  float t = st.t;
+                  float time = fract(czm_frameNumber / 1000.0);
+                  s = s-czm_frameNumber / 60.0;
+                  vec4 rawImage = texture(image, st);
+                  vec4 colorImage = texture(image, vec2(fract(s), t));
+                  vec3 finalColor = colorImage.rgb * colorImage.a + backgroundColor.rgb * (1.0 - colorImage.a);
+                  material.diffuse = finalColor;
+                  material.alpha = mix(backgroundColor.a ,1.0, colorImage.a);
+                  return material;
+              }
+          `,
+    },
+  });
+  addFlowLine(viewer);
+  function addFlowLine(viewer) {
+    let data = [
+    [110.57315539991978, 27.88574734630947],
+    [113.1880484982834, 27.574403124299916],
+    [118.1880484982834, 27.574403124299916],
+    [118.85621021175756, 27.99746963376292]
+    ]
+
+    const newData = data.flat();
+
+    const instance = new Cesium.GeometryInstance({
+      geometry: new Cesium.GroundPolylineGeometry({
+        positions: Cesium.Cartesian3.fromDegreesArray(newData),
+        vertexFormat: Cesium.VertexFormat.ALL,
+        width: 20,
+      }),
+      attributes: {
+        color: Cesium.ColorGeometryInstanceAttribute.fromColor(new Cesium.Color(1.0, 0.0, 0.0, 1.0))
+      }
+    });
+
+    const primitive = viewer.scene.primitives.add(
+      new Cesium.GroundPolylinePrimitive({
+        geometryInstances: instance,
+        appearance: new Cesium.PolylineMaterialAppearance({
+          material: customMaterial1,
+          // material: Cesium.Material.fromType('Color', {
+          //     color: new Cesium.Color(1.0, 0.0, 0.0, 1.0)
+          // }),
+        }),
+        asynchronous: true,
+      })
+    );
+  }
+
+};
 function addCylinderGeometry(viewer) {
   const circle = new Cesium.CylinderGeometry({
     //  vertexFormat: Cesium.MaterialAppearance.VERTEX_FORMAT,
