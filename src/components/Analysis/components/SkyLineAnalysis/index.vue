@@ -42,7 +42,7 @@
 			showdrawchart.value = true;
 			setTimeout(() => {
 				 skyLineHandler.getSkyline2D();
-			}, 1000);
+			}, 200);
 		}
 	}
 	// 清除天际线
