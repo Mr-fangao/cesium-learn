@@ -1,8 +1,8 @@
 <!--
  * @Author: liqifeng
  * @Date: 2025-03-11 16:59:45
- * @LastEditors: liqifeng Mr.undefine@protonmail.com
- * @LastEditTime: 2025-03-21 14:14:00
+ * @LastEditors: Mr-fangao Mr.undefine@protonmail.com
+ * @LastEditTime: 2025-03-24 21:28:33
  * @Description: 
 -->
 <script setup>
@@ -83,7 +83,7 @@ const customMaterial = new Cesium.Material({
     uniforms: {
       color: Cesium.Color.TRANSPARENT,
       backgroundColor: Cesium.Color.TRANSPARENT,
-      image: "/public/img/arrow2.png",
+      image: "/img/arrow2.png",
       imageW: 20,
     },
     source: `
@@ -157,7 +157,7 @@ function addFlowLine2(viewer) {
   }
   Cesium.PolylineTrailLinkMaterialProperty = PolylineTrailLinkMaterialProperty;
   Cesium.Material.PolylineTrailLinkType = 'PolylineTrailLink';
-  Cesium.Material.PolylineTrailLinkImage = "/public/img/arrow.png";//colors  
+  Cesium.Material.PolylineTrailLinkImage = "/img/arrow.png";//colors  
   Cesium.Material.PolylineTrailLinkSource = "czm_material czm_getMaterial(czm_materialInput materialInput)\n\
                                                       {\n\
                                                            czm_material material = czm_getDefaultMaterial(materialInput);\n\
@@ -204,7 +204,7 @@ function addFlowLine3(viewer) {
       uniforms: {
         color: Cesium.Color.TRANSPARENT,
         backgroundColor: Cesium.Color.TRANSPARENT,
-        image: "/public/img/arrow.png",
+        image: "/img/arrow.png",
         imageW: 20,
       },
       source: `
@@ -224,7 +224,7 @@ function addFlowLine3(viewer) {
                   vec2 pos = rotate(v_polylineAngle) * gl_FragCoord.xy;
                   float s = pos.x / (imageW * czm_pixelRatio);
                   float t = st.t;
-                  float time = fract(czm_frameNumber / 1000.0);
+                  float time = fract(czm_frameNumber / 10000.0);
                   s = s-czm_frameNumber / 60.0;
                   vec4 rawImage = texture(image, st);
                   vec4 colorImage = texture(image, vec2(fract(s), t));
