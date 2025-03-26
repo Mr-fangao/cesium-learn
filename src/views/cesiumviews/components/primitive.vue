@@ -2,7 +2,7 @@
  * @Author: liqifeng
  * @Date: 2025-03-11 16:59:45
  * @LastEditors: Mr-fangao Mr.undefine@protonmail.com
- * @LastEditTime: 2025-03-24 21:28:33
+ * @LastEditTime: 2025-03-26 22:07:18
  * @Description: 
 -->
 <script setup>
@@ -224,7 +224,7 @@ function addFlowLine3(viewer) {
                   vec2 pos = rotate(v_polylineAngle) * gl_FragCoord.xy;
                   float s = pos.x / (imageW * czm_pixelRatio);
                   float t = st.t;
-                  float time = fract(czm_frameNumber / 10000.0);
+                  float time = fract(czm_frameNumber / 100000.0);
                   s = s-czm_frameNumber / 60.0;
                   vec4 rawImage = texture(image, st);
                   vec4 colorImage = texture(image, vec2(fract(s), t));
