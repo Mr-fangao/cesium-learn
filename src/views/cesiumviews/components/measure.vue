@@ -6,7 +6,7 @@
  * @Description: 
 -->
 <script setup>
-import Analysis from '@/components/Analysis/index.vue';
+import Measure from '@/components/Measure/index.vue';
 import { GlobalState } from "@/buss/GlobalState";
 import useLoginStore from "@/store/login.js";
 import { useRouter } from 'vue-router';
@@ -36,10 +36,10 @@ onMounted(() => {
     guiContainer.value.appendChild(gui.domElement);
     nextTick(() => {
         viewer = GlobalState.getInstance().viewer;
-        viewer.terrainProvider = new Cesium.CesiumTerrainProvider({
-            url: Cesium.IonResource.fromAssetId(1),
-            requestWaterMask: true
-        });
+        // viewer.terrainProvider = new Cesium.CesiumTerrainProvider({
+        //     url: Cesium.IonResource.fromAssetId(1),
+        //     requestWaterMask: true
+        // });
     });
 });
 </script>
@@ -47,7 +47,7 @@ onMounted(() => {
 <template>
     <div class="analysis-container">
         <div id="GuiContainer" ref="guiContainer"></div>
-        <Analysis ref="analysisRef" v-show="true" :top="'22vh'" :left="'2vh'"></Analysis>
+        <Measure  v-show="true" :top="'22vh'" :left="'2vh'"></Measure>
     </div>
 </template>
 

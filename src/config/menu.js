@@ -2,7 +2,7 @@
  * @Author: liqifeng
  * @Date: 2025-03-11 16:35:56
  * @LastEditors: liqifeng Mr.undefine@protonmail.com
- * @LastEditTime: 2025-03-14 14:39:55
+ * @LastEditTime: 2025-03-27 10:40:59
  * @Description: 
  */
 export const menuConfig = [
@@ -21,10 +21,11 @@ export const menuConfig = [
     icon: "home",
   },
   {
-    id: "contact",
-    name: "联系我们",
-    path: "/contact",
-    icon: "email",
+    id: "measure",
+    name: "Measure",
+    path: "/measure",
+    content:"地图量算",
+    icon: "home",
   },
   {
     id: "shader",
